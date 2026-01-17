@@ -1,0 +1,146 @@
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.4.0
+    hostname: zookeeper
+    container_name: inventory-zookeeper
+    ports:
+      - '2181:2181'
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - inventory-network
+
+  kafka:
+    image: confluentinc/cp-kafka:7.4.0
+    hostname: kafka
+    container_name: inventory-kafka
+    depends_on:
+      - zookeeper
+    env_file:
+      - .env
+    ports:
+      - '29092:29092'
+    networks:
+      - inventory-network
+
+  control-center:
+    image: confluentinc/cp-enterprise-control-center:7.4.0
+    hostname: control-center
+    container_name: inventory-control-center
+    depends_on:
+      - kafka
+    ports:
+      - '9021:9021'
+    env_file:
+      - .env
+    networks:
+      - inventory-network
+
+  postgres:
+    image: postgres:16-alpine
+    hostname: postgres
+    container_name: inventory-postgres
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - '5433:5432'
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-inventory_db}',
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - inventory-network
+
+  redis:
+    image: redis:6-alpine
+    hostname: redis
+    container_name: inventory-redis
+    restart: unless-stopped
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - inventory-network
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: inventory-api
+    command: npm run start:api
+    ports:
+      - '4000:4000'
+      - '9230:9230'
+      - '9229:9229'
+    env_file:
+      - .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+    networks:
+      - inventory-network
+    volumes:
+      - ./apps/:/usr/src/app/apps
+      - ./libs/:/usr/src/app/libs
+      - ./dist/:/usr/src/app/dist
+
+  frontend:
+    build:
+      context: .
+      dockerfile: apps/frontend/Dockerfile
+    container_name: inventory-frontend
+    ports:
+      - '3000:80'
+    depends_on:
+      - api
+    networks:
+      - inventory-network
+
+  consumer:
+    build:
+      context: .
+      dockerfile: apps/consumer/Dockerfile
+    container_name: inventory-consumer
+    command: npm run start:consumer
+    env_file:
+      - .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+    networks:
+      - inventory-network
+    volumes:
+      - ./apps/:/usr/src/app/apps
+      - ./libs/:/usr/src/app/libs
+      - ./dist/:/usr/src/app/dist
+
+volumes:
+  postgres-data:
+  redis-data:
+
+networks:
+  inventory-network:
+    driver: bridge
