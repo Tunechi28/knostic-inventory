@@ -47,12 +47,14 @@ export class StoreController {
   @ApiQuery({ name: 'search', required: false, type: String })
   async listStores(
     @CurrentUser() user: AuthPayload,
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 10,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
     @Query('search') search?: string,
   ) {
-    this.logger.log(`Request to list stores for user ${user.userId} with page=${page}, limit=${limit}`);
-    return this.storeService.listStores({ userId: user.userId, page, limit, search });
+    const pageNum = page ? parseInt(page, 10) : 1;
+    const limitNum = limit ? parseInt(limit, 10) : 10;
+    this.logger.log(`Request to list stores for user ${user.userId} with page=${pageNum}, limit=${limitNum}`);
+    return this.storeService.listStores({ userId: user.userId, page: pageNum, limit: limitNum, search });
   }
 
   @Post()
@@ -143,17 +145,19 @@ export class StoreController {
   async getStoreProducts(
     @CurrentUser() user: AuthPayload,
     @Param(new ValidationPipe()) params: StoreParamDto,
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 10,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
     @Query('category') category?: string,
     @Query('search') search?: string,
   ) {
+    const pageNum = page ? parseInt(page, 10) : 1;
+    const limitNum = limit ? parseInt(limit, 10) : 10;
     this.logger.log(
       `Request for products in store ${params.storeId} by user ${user.userId}`,
     );
     return this.storeService.getStoreProducts(user.userId, params.storeId, {
-      page,
-      limit,
+      page: pageNum,
+      limit: limitNum,
       category,
       search,
     });

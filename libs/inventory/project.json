@@ -4,5 +4,14 @@
   "sourceRoot": "libs/inventory/src",
   "projectType": "library",
   "tags": [],
-  "targets": {}
+  "targets": {
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "libs/inventory/jest.config.ts",
+        "passWithNoTests": true
+      }
+    }
+  }
 }

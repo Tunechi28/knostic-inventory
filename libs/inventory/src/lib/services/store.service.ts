@@ -37,23 +37,18 @@ export class StoreService {
   async createStore(userId: string, createStoreDto: CreateStoreDto): Promise<Store> {
     const existingUser = await this.userRepository.findOne({
       where: { id: userId },
-      relations: ['store'],
     });
 
     if (!existingUser) {
       throw new NotFoundException('User not found');
     }
 
-    if (existingUser.store) {
-      throw new ConflictException('User already has a store');
-    }
-
     const existingStore = await this.storeRepository.findOne({
-      where: { name: createStoreDto.name },
+      where: { name: createStoreDto.name, userId },
     });
 
     if (existingStore) {
-      throw new ConflictException('Store with this name already exists');
+      throw new ConflictException('You already have a store with this name');
     }
 
     const store = this.storeRepository.create({
@@ -63,7 +58,7 @@ export class StoreService {
 
     const savedStore = await this.storeRepository.save(store);
     this.logger.log(`Created store ${savedStore.id} for user ${userId}`);
-    
+
     return savedStore;
   }
 

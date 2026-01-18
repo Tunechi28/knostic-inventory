@@ -52,22 +52,25 @@ export class ProductController {
   @ApiQuery({ name: 'lowStock', required: false, type: Boolean })
   async listProducts(
     @CurrentUser() user: AuthPayload,
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 10,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
     @Query('category') category?: string,
     @Query('search') search?: string,
     @Query('storeId') storeId?: string,
-    @Query('lowStock') lowStock?: boolean,
+    @Query('lowStock') lowStock?: string,
   ) {
+    const pageNum = page ? parseInt(page, 10) : 1;
+    const limitNum = limit ? parseInt(limit, 10) : 10;
+    const lowStockBool = lowStock === 'true';
     this.logger.log(`Request to list products for user ${user.userId}`);
     return this.productService.listProducts({
       userId: user.userId,
-      page,
-      limit,
+      page: pageNum,
+      limit: limitNum,
       category,
       search,
       storeId,
-      lowStock,
+      lowStock: lowStockBool,
     });
   }
 
@@ -175,13 +178,15 @@ export class ProductController {
   async getProductHistory(
     @CurrentUser() user: AuthPayload,
     @Param(new ValidationPipe()) params: ProductParamDto,
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 10,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
   ) {
+    const pageNum = page ? parseInt(page, 10) : 1;
+    const limitNum = limit ? parseInt(limit, 10) : 10;
     this.logger.log(`Request for product history ${params.productId} by user ${user.userId}`);
     return this.productService.getProductHistory(user.userId, params.productId, {
-      page,
-      limit,
+      page: pageNum,
+      limit: limitNum,
     });
   }
 }

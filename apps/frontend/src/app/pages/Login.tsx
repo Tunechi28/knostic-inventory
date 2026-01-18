@@ -47,7 +47,7 @@ function Login() {
       <div className="auth-container">
         <div className="auth-logo">
           <span className="logo-icon">📦</span>
-          <span className="logo-text">InventoryHub</span>
+          <span className="logo-text">Knostichub</span>
         </div>
 
         <div className="auth-card">
@@ -86,7 +86,7 @@ function Login() {
           </form>
 
           <div className="auth-divider">
-            <span>New to InventoryHub?</span>
+            <span>New to Knostichub?</span>
           </div>
 
           <Link to="/register" className="auth-link-button">

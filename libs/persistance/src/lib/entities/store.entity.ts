@@ -2,7 +2,7 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  OneToOne,
+  ManyToOne,
   JoinColumn,
   OneToMany,
   Index,
@@ -16,11 +16,11 @@ export class Store extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Index({ unique: true })
-  @Column({ type: 'uuid', name: 'user_id', unique: true })
+  @Index()
+  @Column({ type: 'uuid', name: 'user_id' })
   userId!: string;
 
-  @OneToOne(() => User, (user) => user.store, { onDelete: 'CASCADE' })
+  @ManyToOne(() => User, (user) => user.stores, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
   user!: User;
 

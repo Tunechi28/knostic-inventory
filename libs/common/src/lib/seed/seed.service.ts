@@ -70,7 +70,7 @@ export class SeedService implements OnApplicationBootstrap {
 
       this.logger.log('Database seeding completed successfully');
     } catch (error) {
-      this.logger.error('Error seeding database:', error);
+      this.logger.error('Error seeding database:', error instanceof Error ? error.message : String(error));
     }
   }
 

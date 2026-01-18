@@ -2,7 +2,7 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  OneToOne,
+  OneToMany,
   Index,
 } from 'typeorm';
 import { Store } from './store.entity';
@@ -20,6 +20,6 @@ export class User extends BaseEntity {
   @Column({ type: 'text', nullable: false, name: 'password_hash' })
   passwordHash!: string;
 
-  @OneToOne(() => Store, (store) => store.user, { cascade: true })
-  store!: Store;
+  @OneToMany(() => Store, (store) => store.user, { cascade: true })
+  stores!: Store[];
 }

@@ -16,7 +16,7 @@ interface Product {
   id: string;
   name: string;
   category: string;
-  price: number;
+  price: number | string;
   quantity: number;
   description: string;
   sku: string;
@@ -157,9 +157,9 @@ function StoreDetail() {
 
       <div className="card">
         <h1>{store.name}</h1>
-        <p>{store.description}</p>
+        {store.description && <p>{store.description}</p>}
         {store.address && <p><strong>Address:</strong> {store.address}</p>}
-        <p><strong>Owner:</strong> {store.user.email}</p>
+        {store.user?.email && <p><strong>Owner:</strong> {store.user.email}</p>}
       </div>
 
       {inventoryValue && (
@@ -234,7 +234,7 @@ function StoreDetail() {
                 </h3>
                 <p><strong>SKU:</strong> {product.sku}</p>
                 <p><strong>Category:</strong> {product.category}</p>
-                <p><strong>Price:</strong> ${product.price.toFixed(2)}</p>
+                <p><strong>Price:</strong> ${Number(product.price).toFixed(2)}</p>
                 <p>
                   <strong>Stock:</strong> 
                   <span style={{ 

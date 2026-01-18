@@ -59,7 +59,7 @@ function Register() {
       <div className="auth-container">
         <div className="auth-logo">
           <span className="logo-icon">📦</span>
-          <span className="logo-text">InventoryHub</span>
+          <span className="logo-text">Knostichub</span>
         </div>
 
         <div className="auth-card">

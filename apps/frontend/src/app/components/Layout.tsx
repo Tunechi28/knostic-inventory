@@ -1,9 +1,23 @@
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 function Layout() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
+  const [userEmail, setUserEmail] = useState<string>('');
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        // Decode JWT payload (base64)
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        setUserEmail(payload.email || '');
+      } catch {
+        setUserEmail('');
+      }
+    }
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -24,7 +38,7 @@ function Layout() {
         <div className="header-main">
           <NavLink to="/" className="header-logo">
             <span className="logo-icon">📦</span>
-            <span className="logo-text">InventoryHub</span>
+            <span className="logo-text">Knostichub</span>
           </NavLink>
 
           <form className="header-search" onSubmit={handleSearch}>
@@ -52,7 +66,7 @@ function Layout() {
 
           <nav className="header-nav">
             <button className="header-account" onClick={handleLogout}>
-              <span className="account-label">Hello, User</span>
+              <span className="account-label">Hello, {userEmail || 'User'}</span>
               <span className="account-action">Sign Out</span>
             </button>
           </nav>
@@ -91,7 +105,7 @@ function Layout() {
       <footer className="footer">
         <div className="footer-content">
           <div className="footer-section">
-            <h4>InventoryHub</h4>
+            <h4>Knostichub</h4>
             <p>Your complete inventory management solution</p>
           </div>
           <div className="footer-section">
@@ -113,7 +127,7 @@ function Layout() {
           </div>
         </div>
         <div className="footer-bottom">
-          <p>&copy; 2024 InventoryHub. All rights reserved.</p>
+          <p>&copy; 2024 Knostichub. All rights reserved.</p>
         </div>
       </footer>
     </div>
