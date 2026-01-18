@@ -94,28 +94,26 @@ This application provides a complete inventory management solution with stores, 
 - Docker & Docker Compose
 - Git
 
-### Local Development
+### Local Deployment
 
 ```bash
-# Clone and install dependencies
+# Clone repository
 git clone <repository>
 cd inventory-app
-npm install
 
 # Start infrastructure services
-docker compose up -d postgres redis kafka
+docker compose up --build -d
+```
 
-# Start backend (with hot reload)
-npm run start:api
-
-# Start frontend (with hot reload)
-npm run start:frontend
-
-# Run tests
+### Run Tests
+```bash
+npm install
 npm run test
 ```
 
 ### Demo Credentials
+
+On the frontend you can click on any demo account and the credential will be populated on the login page
 
 ```
 Email: store1@example.com | Password: password123
@@ -125,27 +123,46 @@ Email: store3@example.com | Password: password123
 
 ## Key Decisions & Trade-offs
 
-### 1. Layered Architecture
+### 1. NX Monorepo Architecture
+**Decision**: Using NX as the build system and monorepo management tool
+**Rationale**:
+- **Code Sharing**: Enables seamless sharing of TypeScript types, utilities, and business logic between frontend, backend, and consumer apps without publishing packages
+- **Affected Commands**: NX intelligently determines which projects are affected by changes, reducing CI/CD build times
+- **Dependency Graph**: Visualizes project dependencies, making architecture decisions transparent
+- **Consistent Tooling**: Unified configuration for linting, testing, and building across all projects
+- **Caching**: Local and remote caching of build artifacts speeds up development and CI
+
+**Trade-offs**:
+- **Learning Curve**: Developers unfamiliar with NX need time to understand project structure and commands
+- **Configuration Complexity**: Initial setup requires understanding NX's project.json and workspace configuration
+- **Tooling Lock-in**: Migrating away from NX would require significant restructuring
+
+**Alternatives Considered**:
+- **Turborepo**: Similar features but less mature NestJS/Node support
+- **Lerna**: Older tool, less feature-rich for build optimization
+- **Separate Repos**: Would require package publishing and versioning overhead
+
+### 2. Layered Architecture
 **Decision**: Maintained a layered architecture (controllers → services → repositories)
 **Rationale**: Clean separation of concerns and testability
 **Trade-off**: Additional boilerplate but better maintainability
 
-### 2. Database Schema
+### 3. Database Schema
 **Decision**: Relational schema with User → Store → Products hierarchy
 **Rationale**: Clear ownership model for inventory items
 **Trade-off**: Join-heavy queries but maintains data integrity
 
-### 3. Frontend Technology Choice
+### 4. Frontend Technology Choice
 **Decision**: React with TypeScript over server-side rendering
 **Rationale**: Provides rich interactivity for inventory management workflows
 **Trade-off**: Additional client-side complexity but better user experience
 
-### 4. Seed Data Strategy
+### 5. Seed Data Strategy
 **Decision**: Automatic seeding on application startup
 **Rationale**: Immediate demonstration value without manual setup
 **Trade-off**: Not production-ready (should be environment-controlled)
 
-### 5. Authentication Approach
+### 6. Authentication Approach
 **Decision**: JWT authentication system
 **Rationale**: Proven implementation with proper security patterns
 **Trade-off**: More complex than basic auth but production-ready
